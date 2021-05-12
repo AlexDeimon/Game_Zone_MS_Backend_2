@@ -19,6 +19,7 @@ allow_credentials=True, allow_methods=["*"], allow_headers=["*"],
 
 api.include_router(router_admin)
 api.include_router(router_client)
+api.include_router(router_product)
 api.include_router(router_compra)
 api.include_router(router_envio)
-api.include_router(router_product)
+

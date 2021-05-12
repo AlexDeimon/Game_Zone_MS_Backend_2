@@ -56,6 +56,7 @@ def delete_compra(id_compra:int,db:Session=Depends(get_db)):
         raise HTTPException(status_code=404,detail="La compra no existe")
     else:
         db.delete(compra)
+        db.delete(envio)
         db.commit()
         Respuesta = respuesta(mensaje="Compra eliminada exitosamente")
         return Respuesta
