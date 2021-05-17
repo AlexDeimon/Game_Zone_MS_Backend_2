@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from datetime import datetime
+from datetime import date
 
 class CompraIn(BaseModel):
     id_cliente: str
@@ -14,8 +14,8 @@ class CompraOut(BaseModel):
     id_cliente: str
     id_producto: str
     metodo_pago:str
-    fecha_compra: datetime
-    fecha_actualizacion_compra: datetime
+    fecha_compra: date
+    fecha_actualizacion_compra: date
 
     class Config:
         orm_mode = True
@@ -24,7 +24,7 @@ class CompraUpdate(BaseModel):
     id_cliente: str
     id_producto: str
     metodo_pago:str
-    fecha_actualizacion_compra: datetime
+    fecha_actualizacion_compra: date
 
     class Config:
         orm_mode = True

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String
+from sqlalchemy import Column, String, Boolean
 from .db_connection import Base, engine
 
 class ClientInDB(Base):
@@ -8,5 +8,6 @@ class ClientInDB(Base):
     email = Column(String(50))
     telefono = Column(String(50))
     direccion = Column(String(50))
+    estado = Column(Boolean(), default=True)
 
 Base.metadata.create_all(bind=engine)

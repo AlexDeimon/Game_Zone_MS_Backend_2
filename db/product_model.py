@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer
+from sqlalchemy import Column, String, Integer, Boolean
 from .db_connection import Base, engine
 
 class ProductInDB(Base):
@@ -7,5 +7,6 @@ class ProductInDB(Base):
     nombre_producto = Column(String(50))
     precio = Column(Integer)
     cantidad_disponible = Column(Integer)
+    estado = Column(Boolean(), default=True)
 
 Base.metadata.create_all(bind=engine)
