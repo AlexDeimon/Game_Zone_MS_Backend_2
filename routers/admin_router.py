@@ -12,7 +12,7 @@ router = APIRouter()
 def auth_admin(admin_in: AdminIn, db: Session = Depends(get_db)):
     admin_in_db = db.query(AdminInDB).get(admin_in.username)
     if admin_in_db == None:
-        raise HTTPException(status_code = 404,detail = "El usuario no existe")
+        raise HTTPException(status_code = 404, detail = "El usuario no existe")
     if admin_in_db.password != admin_in.password:
-        raise HTTPException(status_code=403,detail = "Error de autenticacion")
+        raise HTTPException(status_code = 403, detail = "Error de autenticacion")
     return {"Bienvenido " + admin_in.username}
