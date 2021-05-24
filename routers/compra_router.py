@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from db.db_connection import get_db
 from db.compra_model import CompraInDB
 from schemas.compra_schema import CompraIn, CompraOut, CompraUpdate
+from db.client_model import ClientInDB
 from db.product_model import ProductInDB
 from db.envio_model import EnvioInDB
 from schemas.respuesta import respuesta
@@ -41,20 +42,29 @@ def search_compra(id_compra: int, db: Session = Depends(get_db)):
     else:
         return compra
 
-@router.put("/actualizar/compra/{id_compra}/", response_model = CompraOut, tags = ["compra"])
-def update_compra(id_compra: int, entrada: CompraUpdate, db: Session = Depends(get_db)):
-    try:
-        compra = db.query(CompraInDB).filter(CompraInDB.id_compra == id_compra, CompraInDB.estado == True).first()
-        compra.id_cliente = entrada.id_cliente
-        compra.id_producto = entrada.id_producto
-        compra.metodo_pago = entrada.metodo_pago
-        compra.fecha_actualizacion_compra = entrada.fecha_actualizacion_compra
-        compra.estado = True
-        db.commit()
-        db.refresh(compra)
-        return compra
-    except:
-        raise HTTPException(status_code = 404,detail = "La compra no existe")
+@router.put("/actualizar/compra/", response_model = CompraOut, tags = ["compra"])
+def update_compras(compra_act: CompraUpdate, db: Session = Depends(get_db)):
+    compra = db.query(CompraInDB).get(compra_act.id_compra)
+    cliente = db.query(ClientInDB).filter(ClientInDB.id_cliente == compra_act.id_cliente, ClientInDB.estado == True).first()
+    producto = db.query(ProductInDB).filter(ProductInDB.id_producto == compra_act.id_producto, ProductInDB.estado == True).first()
+
+    if compra == None or compra.estado == False:
+        raise HTTPException(status_code = 404, detail = "El compra no existe")
+    
+    if cliente == None:
+        raise HTTPException(status_code = 404, detail = "El cliente de esta compra no existe")
+
+    if producto == None:
+        raise HTTPException(status_code = 404, detail = "El producto de esta compra no existe")
+
+    compra.id_cliente = compra_act.id_cliente
+    compra.id_producto = compra_act.id_producto
+    compra.metodo_pago = compra_act.metodo_pago
+    compra.fecha_actualizacion_compra = compra_act.fecha_actualizacion_compra
+
+    db.commit()
+    db.refresh(compra)
+    return compra
 
 @router.delete("/eliminar/compra/{id_compra}/", response_model = respuesta, tags = ["compra"])
 def delete_compra(id_compra: int, db: Session = Depends(get_db)):

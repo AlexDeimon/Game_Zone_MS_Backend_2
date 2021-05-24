@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from db.db_connection import get_db
 from db.client_model import ClientInDB
-from schemas.client_schema import Client, ClientUpdate
+from schemas.client_schema import Client
 from db.product_model import ProductInDB
 from db.compra_model import CompraInDB
 from db.envio_model import EnvioInDB
@@ -36,20 +36,21 @@ def search_clients(id_cliente: str, db: Session = Depends(get_db)):
     else:
         return cliente
 
-@router.put("/actualizar/cliente/{id_cliente}/", response_model = Client, tags = ["cliente"])
-def update_clients(id_cliente: str, entrada: ClientUpdate, db: Session = Depends(get_db)):
-    try:
-        cliente = db.query(ClientInDB).filter(ClientInDB.id_cliente == id_cliente, ClientInDB.estado == True).first()
-        cliente.nombre_cliente = entrada.nombre_cliente
-        cliente.email = entrada.email
-        cliente.telefono = entrada.telefono
-        cliente.direccion = entrada.direccion
-        cliente.estado = True
-        db.commit()
-        db.refresh(cliente)
-        return cliente
-    except:
-        raise HTTPException(status_code = 404, detail = "El cliente no existe")
+@router.put("/actualizar/cliente/", response_model = Client, tags = ["cliente"])
+def update_clients(client: Client, db: Session = Depends(get_db)):
+    cliente = db.query(ClientInDB).get(client.id_cliente)
+
+    if cliente.estado == False or cliente == None:
+        raise HTTPException(status_code = 404, detail = "El cliente no existe") 
+
+    cliente.nombre_cliente = client.nombre_cliente
+    cliente.email = client.email
+    cliente.telefono = client.telefono
+    cliente.direccion = client.direccion
+
+    db.commit()
+    db.refresh(cliente)
+    return cliente
 
 @router.delete("/eliminar/cliente/{id_cliente}/", response_model = respuesta, tags = ["cliente"])
 def delete_clients(id_cliente: str, db: Session = Depends(get_db)):

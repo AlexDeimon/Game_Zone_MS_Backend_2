@@ -17,11 +17,3 @@ class EnvioOut(BaseModel):
 
     class Config:
         orm_mode = True
-
-class EnvioUpdate(BaseModel):
-    id_compra: int
-    fecha_envio: date
-    fecha_recibido: date
-
-    class Config:
-        orm_mode = True

@@ -21,6 +21,7 @@ class CompraOut(BaseModel):
         orm_mode = True
 
 class CompraUpdate(BaseModel):
+    id_compra: int
     id_cliente: str
     id_producto: str
     metodo_pago: str

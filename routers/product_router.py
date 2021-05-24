@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from db.db_connection import get_db
 from db.product_model import ProductInDB
-from schemas.product_schema import Product, ProductUpdate
+from schemas.product_schema import Product
 from db.compra_model import CompraInDB
 from db.envio_model import EnvioInDB
 from schemas.respuesta import respuesta
@@ -35,19 +35,19 @@ def search_products(id_producto: str, db: Session = Depends(get_db)):
     else:
         return producto
 
-@router.put("/actualizar/producto/{id_producto}/", response_model = Product, tags = ["producto"])
-def update_products(id_producto: str, entrada: ProductUpdate, db: Session = Depends(get_db)):
-    try:
-        producto = db.query(ProductInDB).filter(ProductInDB.id_producto == id_producto, ProductInDB.estado == True).first()
-        producto.nombre_producto = entrada.nombre_producto
-        producto.precio = entrada.precio
-        producto.cantidad_disponible = entrada.cantidad_disponible
-        producto.estado = True
-        db.commit()
-        db.refresh(producto)
-        return producto
-    except:
+@router.put("/actualizar/producto/", response_model = Product, tags = ["producto"])
+def update_products(product: Product, db: Session = Depends(get_db)):
+    producto = db.query(ProductInDB).get(product.id_producto)
+    if producto.estado == False or producto == None:
         raise HTTPException(status_code = 404, detail = "El producto no existe")
+
+    producto.nombre_producto = product.nombre_producto
+    producto.precio = product.precio
+    producto.cantidad_disponible = product.cantidad_disponible
+
+    db.commit()
+    db.refresh(producto)
+    return producto
 
 @router.delete("/eliminar/producto/{id_producto}/",response_model = respuesta, tags=["producto"])
 def delete_products(id_producto: str, db: Session = Depends(get_db)):
